@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastries Count</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Pastries Count">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/jpeg" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d0907;
+            --card-bg: rgba(20, 12, 8, 0.7);
+            --card-border: rgba(212, 143, 89, 0.2);
+            --card-hover: rgba(212, 143, 89, 0.08);
+            --text-main: #f0b27a;
+            --text-muted: #936b4b;
+            --accent-gold: #f39c12;
+            --accent-warm: #e67e22;
+            --success: #27ae60;
+            --danger: #c0392b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--accent-gold);
+            padding-bottom: 12px;
+        }
+
+        h1 {
+            font-family: 'VT323', monospace;
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+            white-space: nowrap;
+        }
+
+        .meta-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .meta-field {
+            margin-bottom: 10px;
+        }
+
+        .meta-field:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        details.category-group {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        summary.category-title {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--accent-warm);
+            padding: 12px 15px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background: rgba(20, 12, 8, 0.9);
+            border-bottom: 1px solid transparent;
+            transition: background 0.2s;
+        }
+
+        details.category-group[open] summary.category-title {
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        summary.category-title::-webkit-details-marker {
+            display: none;
+        }
+
+        summary.category-title::after {
+            content: '+';
+            font-size: 1.6rem;
+            color: var(--accent-gold);
+        }
+
+        details.category-group[open] summary.category-title::after {
+            content: '-';
+        }
+
+        .category-content {
+            padding: 10px 12px;
+        }
+
+        .item-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-name {
+            font-size: 1rem;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button.ctrl-btn {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+        }
+
+        button.ctrl-btn:active {
+            background: var(--accent-gold);
+            color: var(--bg-color);
+        }
+
+        .count-display {
+            font-family: 'VT323', monospace;
+            font-size: 1.6rem;
+            width: 45px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .actions-bar {
+            margin: 30px 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-save {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-reset {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        #outputBox {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.8);
+            border: 1px dashed var(--accent-gold);
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🥮 Pastry Count 🥮</h1>
+    </header>
+
+    <div class="meta-section">
+        <div class="meta-field">
+            <label for="locationInput">Location:</label>
+            <input type="text" id="locationInput" placeholder="Enter store/location...">
+        </div>
+        <div class="meta-field" style="margin-top: 10px;">
+            <label for="dateInput">Date:</label>
+            <input type="date" id="dateInput">
+        </div>
+    </div>
+
+    <div id="appContainer"></div>
+
+    <div class="actions-bar">
+        <button class="action-btn btn-save" onclick="generateSummary()">Generate / Copy Summary</button>
+        <button class="action-btn btn-reset" onclick="resetCounts()">Reset</button>
+    </div>
+
+    <div id="outputBox"></div>
+
+    <script>
+        const menuData = [
+            {
+                category: "🥐 Croissants 🥐",
+                items: [
+                    "Butter Croissants",
+                    "Chocolate Croissant",
+                    "Multigrain Croissant",
+                    "Raspberry Croissant"
+                ]
+            },
+            {
+                category: "🍪 Cookies 🍪",
+                items: [
+                    "Chocolate Chip Cookies",
+                    "Tahini Cookies",
+                    "Chai Pumpkin Cookies",
+                    "Peanut Butter Cookies",
+                    "Madeleine’s"
+                ]
+            },
+            {
+                category: "🍰 Loaf’s 🍰",
+                items: [
+                    "Lemon Loaf",
+                    "House Loaf Zucchini",
+                    "House Loaf Lemon Ricotta"
+                ]
+            },
+            {
+                category: "🥪 Sandwiches 🥪",
+                items: [
+                    "Ham, Swiss, & Butter",
+                    "Mortadella, Provolone, Arugula",
+                    "Brie, Fig Jam & Arugula"
+                ]
+            }
+        ];
+
+        // Format today's date automatically (YYYY-MM-DD format for input)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        document.getElementById('dateInput').value = `${year}-${month}-${day}`;
+
+        const container = document.getElementById('appContainer');
+
+        menuData.forEach((cat, catIdx) => {
+            const details = document.createElement('details');
+            details.className = 'category-group';
+
+            const summary = document.createElement('summary');
+            summary.className = 'category-title';
+            summary.innerText = cat.category;
+            details.appendChild(summary);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'category-content';
+
+            cat.items.forEach((item, itemIdx) => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'item-name';
+                nameSpan.innerText = item + " - ";
+
+                const controls = document.createElement('div');
+                controls.className = 'counter-controls';
+
+                const minusBtn = document.createElement('button');
+                minusBtn.className = 'ctrl-btn';
+                minusBtn.innerText = "-";
+                minusBtn.onclick = () => updateCount(catIdx, itemIdx, -1);
+
+                const display = document.createElement('span');
+                display.className = 'count-display';
+                display.id = `count-${catIdx}-${itemIdx}`;
+                display.innerText = "0";
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'ctrl-btn';
+                plusBtn.innerText = "+";
+                plusBtn.onclick = () => updateCount(catIdx, itemIdx, 1);
+
+                controls.appendChild(minusBtn);
+                controls.appendChild(display);
+                controls.appendChild(plusBtn);
+
+                card.appendChild(nameSpan);
+                card.appendChild(controls);
+                contentDiv.appendChild(card);
+            });
+
+            details.appendChild(contentDiv);
+            container.appendChild(details);
+        });
+
+        const counts = {};
+
+        function updateCount(catIdx, itemIdx, change) {
+            const key = `${catIdx}-${itemIdx}`;
+            if (!counts[key]) counts[key] = 0;
+            counts[key] = Math.max(0, counts[key] + change);
+            document.getElementById(`count-${catIdx}-${itemIdx}`).innerText = counts[key];
+        }
+
+        function generateSummary() {
+            const location = document.getElementById('locationInput').value || "Unspecified Location";
+            const rawDate = document.getElementById('dateInput').value;
+            
+            // Format date nicely (MM/DD/YYYY) for summary output
+            let formattedDate = rawDate;
+            if (rawDate) {
+                const parts = rawDate.split('-');
+                if (parts.length === 3) {
+                    formattedDate = `${parts[1]}/${parts[2]}/${parts[0]}`;
+                }
+            } else {
+                formattedDate = "Unspecified Date";
+            }
+
+            let summary = `🥮 Pastry Count 🥮\n`;
+            summary += `---------------------------\n\n`;
+            summary += `Location: ${location}\n`;
+            summary += `---------------------------\n`;
+            summary += `Date: ${formattedDate}\n`;
+            summary += `---------------------------\n\n`;
+
+            menuData.forEach((cat, catIdx) => {
+                summary += `${cat.category}\n`;
+                summary += `${'+'.repeat(cat.category.length)}\n\n`;
+
+                cat.items.forEach((item, itemIdx) => {
+                    const count = counts[`${catIdx}-${itemIdx}`] || 0;
+                    
+                    // Check if category is Loaf's to append "Slice"
+                    if (cat.category.includes("Loaf’s")) {
+                        summary += `${item} - ${count} Slice\n`;
+                    } else {
+                        summary += `${item} - ${count}\n`;
+                    }
+                });
+
+                summary += `\n::::::::::::::::::::::::::::::::::::::::::::::::::\n\n`;
+            });
+
+            const outputBox = document.getElementById('outputBox');
+            outputBox.style.display = 'block';
+            outputBox.innerText = summary;
+
+            navigator.clipboard.writeText(summary).then(() => {
+                alert("Summary generated and copied to clipboard!");
+            }).catch(() => {
+                alert("Summary generated below!");
+            });
+        }
+
+        function resetCounts() {
+            if (confirm("Reset all counters to zero?")) {
+                for (const key in counts) {
+                    counts[key] = 0;
+                    const el = document.getElementById(`count-${key}`);
+                    if (el) el.innerText = "0";
+                }
+                document.getElementById('outputBox').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
