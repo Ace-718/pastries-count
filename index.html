@@ -257,7 +257,7 @@
 <body>
 
     <header>
-        <h1>🥮 Pastry Count 🥮</h1>
+        <h1>🥮 Pastry ♠️ Count 🥮</h1>
     </header>
 
     <!-- Password Screen -->
@@ -279,7 +279,7 @@
             </div>
             <div class="meta-field" style="margin-top: 10px;">
                 <label for="dateInput">Date:</label>
-                <input type="date" id="dateInput">
+                <input type="text" id="dateInput">
             </div>
         </div>
 
@@ -356,13 +356,13 @@
             }
         ];
 
-        // Format today's date automatically (YYYY-MM-DD format for input)
+        // Format today's date automatically (MM/DD/YYYY format for input)
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         const dateInputEl = document.getElementById('dateInput');
-        if (dateInputEl) dateInputEl.value = `${year}-${month}-${day}`;
+        if (dateInputEl) dateInputEl.value = `${month}/${day}/${year}`;
 
         const container = document.getElementById('appContainer');
 
