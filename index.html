@@ -68,6 +68,12 @@
             margin-bottom: 20px;
         }
 
+        .auth-card {
+            max-width: 400px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
         .meta-field {
             margin-bottom: 10px;
         }
@@ -85,7 +91,7 @@
             letter-spacing: 1px;
         }
 
-        input[type="text"], input[type="date"] {
+        input[type="text"], input[type="date"], input[type="password"] {
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--card-border);
@@ -254,27 +260,64 @@
         <h1>🥮 Pastry Count 🥮</h1>
     </header>
 
-    <div class="meta-section">
+    <!-- Password Screen -->
+    <div id="authScreen" class="meta-section auth-card">
         <div class="meta-field">
-            <label for="locationInput">Location:</label>
-            <input type="text" id="locationInput" placeholder="Enter store/location...">
+            <label for="passwordInput">Enter App Password:</label>
+            <input type="password" id="passwordInput" placeholder="Password...">
         </div>
-        <div class="meta-field" style="margin-top: 10px;">
-            <label for="dateInput">Date:</label>
-            <input type="date" id="dateInput">
-        </div>
+        <button class="action-btn btn-save" style="margin-top: 15px; width: 100%;" onclick="verifyPassword()">Unlock App</button>
+        <div id="authError" style="color: var(--danger); margin-top: 10px; font-size: 0.9rem; display: none;">Incorrect password, try again.</div>
     </div>
 
-    <div id="appContainer"></div>
+    <!-- Main App Content (Hidden Initially) -->
+    <div id="mainAppContent" style="display: none;">
+        <div class="meta-section">
+            <div class="meta-field">
+                <label for="locationInput">Location:</label>
+                <input type="text" id="locationInput" placeholder="Enter store/location...">
+            </div>
+            <div class="meta-field" style="margin-top: 10px;">
+                <label for="dateInput">Date:</label>
+                <input type="date" id="dateInput">
+            </div>
+        </div>
 
-    <div class="actions-bar">
-        <button class="action-btn btn-save" onclick="generateSummary()">Generate / Copy Summary</button>
-        <button class="action-btn btn-reset" onclick="resetCounts()">Reset</button>
+        <div id="appContainer"></div>
+
+        <div class="actions-bar">
+            <button class="action-btn btn-save" onclick="generateSummary()">Generate / Copy Summary</button>
+            <button class="action-btn btn-reset" onclick="resetCounts()">Reset</button>
+        </div>
+
+        <div id="outputBox"></div>
     </div>
-
-    <div id="outputBox"></div>
 
     <script>
+        // CHANGE YOUR PASSWORD HERE
+        const APP_PASSWORD = "Ace";
+
+        function verifyPassword() {
+            const enteredPassword = document.getElementById('passwordInput').value;
+            if (enteredPassword === APP_PASSWORD) {
+                // Using localStorage so it stays unlocked permanently on this device
+                localStorage.setItem('pastryAppAuth', 'true');
+                unlockApp();
+            } else {
+                document.getElementById('authError').style.display = 'block';
+            }
+        }
+
+        function unlockApp() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'block';
+        }
+
+        // Check persistent storage on load
+        if (localStorage.getItem('pastryAppAuth') === 'true') {
+            unlockApp();
+        }
+
         const menuData = [
             {
                 category: "🥐 Croissants 🥐",
@@ -318,7 +361,8 @@
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
-        document.getElementById('dateInput').value = `${year}-${month}-${day}`;
+        const dateInputEl = document.getElementById('dateInput');
+        if (dateInputEl) dateInputEl.value = `${year}-${month}-${day}`;
 
         const container = document.getElementById('appContainer');
 
@@ -386,7 +430,6 @@
             const location = document.getElementById('locationInput').value || "Unspecified Location";
             const rawDate = document.getElementById('dateInput').value;
             
-            // Format date nicely (MM/DD/YYYY) for summary output
             let formattedDate = rawDate;
             if (rawDate) {
                 const parts = rawDate.split('-');
@@ -411,7 +454,6 @@
                 cat.items.forEach((item, itemIdx) => {
                     const count = counts[`${catIdx}-${itemIdx}`] || 0;
                     
-                    // Check if category is Loaf's to append "Slice"
                     if (cat.category.includes("Loaf’s")) {
                         summary += `${item} - ${count} Slice\n`;
                     } else {
